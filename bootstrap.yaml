@@ -1,0 +1,145 @@
+---
+- hosts: keep
+  gather_facts: no
+  become: yes
+  
+  tasks:
+    - name: Create keep operating user
+      user:
+        name: "{{ username }}"
+        password: "{{ password | password_hash('sha512')}}"
+        shell: /bin/bash
+        groups:
+          - sudo
+        comment: The KEEP operating user
+        state: present
+        
+    - block:
+      - name: Install aptitude using apt
+        apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+      - name: Install required system packages
+        apt: name={{ item }} state=latest update_cache=yes
+        loop: [ 'apt-transport-https', 'ca-certificates', 'acl', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+      - name: Add Docker GPG apt Key
+        apt_key:
+          url: https://download.docker.com/linux/ubuntu/gpg
+          state: present
+
+      - name: Add Docker Repository
+        apt_repository:
+          repo: deb https://download.docker.com/linux/ubuntu bionic stable
+          state: present
+
+      - name: Update apt and install docker-ce
+        apt: update_cache=yes name=docker-ce state=latest
+
+      - name: Install Docker Module for Python
+        pip:
+          name: docker
+
+      tags:
+        - dockersetup
+    
+    - block:
+      - name: Pull keep-client Docker image
+        docker_image:
+          name: "keepnetwork/keep-client:{{ docker.client_version }}"
+          source: pull
+
+      - name: Pull keep-ecdsa-client Docker image
+        docker_image:
+          name: "keepnetwork/keep-ecdsa-client:{{ docker.ecdsa_version }}"
+          source: pull
+
+      tags:
+        - dockerpull
+
+
+    - name: Create keep-client directories if they don't exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ username }}"
+      with_items:
+        - "{{ '/home/{0}/keep-client'.format(username) }}"
+        - "{{ '/home/{0}/keep-client/config'.format(username) }}"
+        - "{{ '/home/{0}/keep-client/keystore'.format(username) }}"
+        - "{{ '/home/{0}/keep-client/persistence'.format(username) }}"
+    
+    - name: Deploy keep-client config
+      template:
+        owner: "{{ username }}"
+        src: templates/keep-client/config.toml.jn2
+        dest: "{{ '/home/{0}/keep-client/config/config.toml'.format(username) }}"
+
+    - name: Deploy keep_wallet.json for keep-client
+      copy:
+        owner: "{{ username }}"
+        src: "{{ wallet }}"
+        dest: "{{ '/home/{0}/keep-client/keystore/keep_wallet.json'.format(username) }}"
+
+
+    - name: Create keep-ecdsa directories if they don't exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ username }}"
+      with_items:
+        - "{{ '/home/{0}/keep-ecdsa'.format(username) }}"
+        - "{{ '/home/{0}/keep-ecdsa/config'.format(username) }}"
+        - "{{ '/home/{0}/keep-ecdsa/keystore'.format(username) }}"
+        - "{{ '/home/{0}/keep-ecdsa/persistence'.format(username) }}"
+        - "{{ '/home/{0}/keep-ecdsa/persistence/archive'.format(username) }}"
+        - "{{ '/home/{0}/keep-ecdsa/persistence/current'.format(username) }}"
+
+    - name: Deploy keep-ecdsa config
+      template:
+        owner: "{{ username }}"
+        src: templates/keep-ecdsa/config.toml.jn2
+        dest: "{{ '/home/{0}/keep-ecdsa/config/config.toml'.format(username) }}"
+
+    - name: Deploy keep_wallet.json for keep-ecdsa
+      copy:
+        owner: "{{ username }}"
+        src: "{{ wallet }}"
+        dest: "{{ '/home/{0}/keep-ecdsa/keystore/keep_wallet.json'.format(username) }}"
+
+
+
+    - name: Run the keep-client container
+      become: yes
+      docker_container:
+        image: "keepnetwork/keep-client:{{ docker.client_version }}"
+        name: keep-client
+        state: started
+        restart: yes
+        command: --config /mnt/config/config.toml start
+        volumes:
+          - "{{ '/home/{0}/keep-client:/mnt'.format(username) }}"
+        ports: "{{ '{0}:{1}'.format(keepclient.port.local, keepclient.port.container) }}"
+        env:
+          LOG_LEVEL: info
+          KEEP_ETHEREUM_PASSWORD: "{{ account.password }}"
+          IPFS_LOGGING_FMT: nocolor
+          GOLOG_FILE: /var/log/keep/keep.log
+          GOLOG_TRACING_FILE: /var/log/keep/trace.json
+
+
+    - name: Run the keep-ecdsa container
+      become: yes
+      docker_container:
+        image: "keepnetwork/keep-ecdsa-client:{{ docker.ecdsa_version }}"
+        name: keep-ecdsa
+        state: started
+        restart: yes
+        command: --config /mnt/keep-ecdsa/config/config.toml start
+        entrypoint:
+          - /usr/local/bin/keep-ecdsa 
+        volumes:
+          - "{{ '/home/{0}/keep-ecdsa:/mnt/keep-ecdsa'.format(username) }}"
+        ports: "{{ '{0}:{1}'.format(keepecdsa.port.local, keepecdsa.port.container) }}"
+        env:
+          LOG_LEVEL: info
+          KEEP_ETHEREUM_PASSWORD: "{{ account.password }}"

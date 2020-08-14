@@ -1,0 +1,30 @@
+# Ethereum host connection info.
+[ethereum]
+  URL = "{{ ethereum.url }}"
+  URLRPC = "{{ ethereum.urlrpc }}"
+
+# Keep operator Ethereum account.
+[ethereum.account]
+  Address = "{{ account.address }}"
+  KeyFile = "/mnt/keystore/keep_wallet.json"
+
+# Keep contract addresses configuration.
+[ethereum.ContractAddresses]
+  TokenStaking = "{{ keepclient.contracts.TokenStaking }}"
+  KeepRandomBeaconService = "{{ keepclient.contracts.KeepRandomBeaconService }}"
+  KeepRandomBeaconOperator = "{{ keepclient.contracts.KeepRandomBeaconOperator }}"
+
+# Keep network configuration.
+[LibP2P]
+  Peers = [
+    {% for peer in keepclient.peers %}
+    "{{ peer }}",
+    {% endfor %}
+  ]
+  Port = {{ keepclient.port.container }}
+  # Override the node’s default addresses announced in the network
+  AnnouncedAddresses = ["/ip4/{{ ip }}/tcp/{{ keepclient.port.local }}"]
+
+# Storage is encrypted
+[Storage]
+  DataDir = "/mnt/persistence"

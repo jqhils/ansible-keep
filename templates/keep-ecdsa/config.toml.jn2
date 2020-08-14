@@ -1,0 +1,42 @@
+# Ethereum host connection info.
+[ethereum]
+  URL = "{{ ethereum.url }}"
+  URLRPC = "{{ ethereum.urlrpc }}"
+
+# Keep operator Ethereum account.
+[ethereum.account]
+  Address = "{{ account.address }}"
+  KeyFile = "/mnt/keep-ecdsa/keystore/keep_wallet.json"
+
+# Addresses of contracts deployed on ethereum blockchain.
+[ethereum.ContractAddresses]
+  BondedECDSAKeepFactory = "{{ keepecdsa.contracts.BondedECDSAKeepFactory }}"
+
+# Addresses of applications approved by the operator.
+[SanctionedApplications]
+  Addresses = [
+    {% for app in keepecdsa.sanctioned_apps %}
+    "{{ app }}"
+    {% endfor %}
+  ]
+
+[Storage]
+  DataDir = "/mnt/keep-ecdsa/persistence"
+
+[LibP2P]
+  Peers = [
+    {% for peer in keepecdsa.peers %}
+    "{{ peer }}",
+    {% endfor %}
+  ]
+
+  Port = {{ keepecdsa.port.container }}
+  # Override the node’s default addresses announced in the network
+  AnnouncedAddresses = ["/ip4/{{ ip }}/tcp/{{ keepecdsa.port.local }}"]
+
+[TSS]
+# Timeout for TSS protocol pre-parameters generation. The value
+# should be provided based on resources available on the machine running the client.
+# This is an optional parameter, if not provided timeout for TSS protocol
+# pre-parameters generation will be set to `2 minutes`.
+  PreParamsGenerationTimeout = "2m30s"
