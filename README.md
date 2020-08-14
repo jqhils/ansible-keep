@@ -1,4 +1,4 @@
-# Ansible KEEP Playbook Collection
+# 🏰 Ansible KEEP Playbook Collection
 > Trust Math, Not Hardware.
 ## This repository contains sets of ansible playbooks for deploying, monitoring and managing KEEP validator instances.
 
