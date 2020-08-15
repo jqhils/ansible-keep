@@ -1,0 +1,12 @@
+---
+- name: Allow all acces to tcp port configured for keep-client
+  ufw:
+    rule: allow
+    port: "{{ keep_client.port.local }}"
+    proto: tcp
+
+- name: Allow all acces to tcp port configured for keep-ecdsa
+  ufw:
+    rule: allow
+    port: "{{ keep_ecdsa.port.local }}"
+    proto: tcp

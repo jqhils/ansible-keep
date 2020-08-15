@@ -12,8 +12,8 @@ account:
 
 # Version of the docker image(s) to run.
 docker:
-  client_version: latest
-  ecdsa_version: v1.2.0-rc
+  keep_client_version: latest
+  keep_ecdsa_version: v1.2.0-rc
 
 
 # Ethereum blockchain connectivity
@@ -23,7 +23,7 @@ ethereum:
 
 
 # Keep-Client Details
-keepclient:
+keep_client:
   contracts:
     TokenStaking: "0x88B3D0Bfb8F207292Dc4Cee7C923d0E7C3078a18"
     KeepRandomBeaconService: "0xa5018dbeB6920A04e0CFd3D8F0F45BC851838b0D"
@@ -40,7 +40,7 @@ keepclient:
 
 
 # Keep-ECDSA-Client Details
-keepecdsa:
+keep_ecdsa:
   contracts:
     BondedECDSAKeepFactory: "0xb37c8696cD023c11357B37b5b12A9884c9C83784"
   sanctioned_apps:

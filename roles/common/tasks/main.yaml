@@ -1,0 +1,10 @@
+---
+- name: Create keep operating user
+  user:
+    name: "{{ username }}"
+    password: "{{ password | password_hash('sha512')}}"
+    shell: /bin/bash
+    groups:
+      - sudo
+    comment: The KEEP operating user
+    state: present

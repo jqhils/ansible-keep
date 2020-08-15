@@ -1,0 +1,30 @@
+---
+- name: Pull keep-ecdsa-client Docker image
+  docker_image:
+    name: "keepnetwork/keep-ecdsa-client:{{ docker.keep_ecdsa_version }}"
+    source: pull
+
+- name: Create keep-ecdsa directories if they don't exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ username }}"
+  with_items:
+    - "{{ '/home/{0}/keep-ecdsa'.format(username) }}"
+    - "{{ '/home/{0}/keep-ecdsa/config'.format(username) }}"
+    - "{{ '/home/{0}/keep-ecdsa/keystore'.format(username) }}"
+    - "{{ '/home/{0}/keep-ecdsa/persistence'.format(username) }}"
+    - "{{ '/home/{0}/keep-ecdsa/persistence/archive'.format(username) }}"
+    - "{{ '/home/{0}/keep-ecdsa/persistence/current'.format(username) }}"
+
+- name: Deploy keep-ecdsa config
+  template:
+    owner: "{{ username }}"
+    src: config.toml.jn2
+    dest: "{{ '/home/{0}/keep-ecdsa/config/config.toml'.format(username) }}"
+
+- name: Deploy keep_wallet.json for keep-ecdsa
+  copy:
+    owner: "{{ username }}"
+    src: "{{ wallet }}"
+    dest: "{{ '/home/{0}/keep-ecdsa/keystore/keep_wallet.json'.format(username) }}"

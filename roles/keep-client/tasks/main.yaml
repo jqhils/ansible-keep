@@ -1,0 +1,28 @@
+---
+- name: Pull keep-client Docker image
+  docker_image:
+    name: "keepnetwork/keep-client:{{ docker.keep_client_version }}"
+    source: pull
+
+- name: Create keep-client directories if they don't exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ username }}"
+  with_items:
+    - "{{ '/home/{0}/keep-client'.format(username) }}"
+    - "{{ '/home/{0}/keep-client/config'.format(username) }}"
+    - "{{ '/home/{0}/keep-client/keystore'.format(username) }}"
+    - "{{ '/home/{0}/keep-client/persistence'.format(username) }}"
+
+- name: Deploy keep-client config
+  template:
+    owner: "{{ username }}"
+    src: config.toml.jn2
+    dest: "{{ '/home/{0}/keep-client/config/config.toml'.format(username) }}"
+
+- name: Deploy keep_wallet.json for keep-client
+  copy:
+    owner: "{{ username }}"
+    src: "{{ wallet }}"
+    dest: "{{ '/home/{0}/keep-client/keystore/keep_wallet.json'.format(username) }}"
