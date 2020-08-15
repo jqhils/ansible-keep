@@ -10,20 +10,20 @@
 
 # Keep contract addresses configuration.
 [ethereum.ContractAddresses]
-  TokenStaking = "{{ keepclient.contracts.TokenStaking }}"
-  KeepRandomBeaconService = "{{ keepclient.contracts.KeepRandomBeaconService }}"
-  KeepRandomBeaconOperator = "{{ keepclient.contracts.KeepRandomBeaconOperator }}"
+  TokenStaking = "{{ keep_client.contracts.TokenStaking }}"
+  KeepRandomBeaconService = "{{ keep_client.contracts.KeepRandomBeaconService }}"
+  KeepRandomBeaconOperator = "{{ keep_client.contracts.KeepRandomBeaconOperator }}"
 
 # Keep network configuration.
 [LibP2P]
   Peers = [
-    {% for peer in keepclient.peers %}
+    {% for peer in keep_client.peers %}
     "{{ peer }}",
     {% endfor %}
   ]
-  Port = {{ keepclient.port.container }}
+  Port = {{ keep_client.port.container }}
   # Override the node’s default addresses announced in the network
-  AnnouncedAddresses = ["/ip4/{{ ip }}/tcp/{{ keepclient.port.local }}"]
+  AnnouncedAddresses = ["/ip4/{{ ip }}/tcp/{{ keep_client.port.local }}"]
 
 # Storage is encrypted
 [Storage]
