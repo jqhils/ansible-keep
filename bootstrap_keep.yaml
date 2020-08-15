@@ -1,12 +1,15 @@
 ---
 - hosts: keep
   gather_facts: no
-  become: yes
-  
+    
+  vars_files:
+    - ./vars/vars.yaml
+
   roles:
     - firewall
     - common
-    - docker-setup
+    - role: docker-setup
+      become: yes
     - keep-client
     - keep-ecdsa
 
