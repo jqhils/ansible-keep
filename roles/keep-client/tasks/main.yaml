@@ -1,5 +1,6 @@
 ---
 - name: Pull keep-client Docker image
+  become: yes
   docker_image:
     name: "keepnetwork/keep-client:{{ docker.keep_client_version }}"
     source: pull

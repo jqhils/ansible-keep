@@ -1,12 +1,13 @@
 ---
 - hosts: keep
   gather_facts: no
-  become: yes
+  
+  vars_files:
+    - ./vars/vars.yaml
   
   roles:
     - firewall
     - common
-#    - docker-setup
     - keep-client
     - keep-ecdsa
 
@@ -14,7 +15,6 @@
     - block:
       - name: Run the keep-client container
         become: yes
-        become_user: "{{ username }}"
         docker_container:
           image: "keepnetwork/keep-client:{{ docker.keep_client_version }}"
           name: keep-client
@@ -37,7 +37,6 @@
     - block:
       - name: Run the keep-ecdsa container
         become: yes
-        become_user: "{{ username }}"
         docker_container:
           image: "keepnetwork/keep-ecdsa-client:{{ docker.keep_ecdsa_version }}"
           name: keep-ecdsa

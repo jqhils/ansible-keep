@@ -1,5 +1,6 @@
 ---
 - name: Pull keep-ecdsa-client Docker image
+  become: yes
   docker_image:
     name: "keepnetwork/keep-ecdsa-client:{{ docker.keep_ecdsa_version }}"
     source: pull

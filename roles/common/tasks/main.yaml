@@ -1,8 +1,8 @@
 ---
 - name: Create keep operating user
+  become: yes
   user:
     name: "{{ username }}"
-    password: "{{ password | password_hash('sha512')}}"
     shell: /bin/bash
     groups:
       - sudo

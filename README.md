@@ -1,13 +1,13 @@
 # 🏰 Ansible KEEP Playbook Collection
 > Trust Math, Not Hardware.
-Sets of ansible playbooks for deploying, monitoring and managing KEEP validator instances.
-Currently supports Ropsten. Main net in the works.
+
+Set of ansible playbooks for deploying, monitoring and managing KEEP validator instances.
 
 
-# PREREQUISITES
+# Prerequisites
 * Ansible
     * [Install Guide](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-* Ubuntu 20.04 LTS Server setup with a sudo-enabled user to operate ansible tasks. (recommend Linode)
+* Ubuntu Server setup with a sudo-enabled user to operate ansible tasks.
     * Support for other OS families scoped.
 
 
@@ -36,17 +36,21 @@ ansible-playbook bootstrap_keep.yaml -i hosts -K
 After successfully setting up keep instances, explore the other additional playbooks:
 
 ## Additionally...
-Once you've bootstrapped and you want to deploy a configuration change. You can re-execute the command with the following tag to skip preliminary setup tasks. This will become reduntant in future releases:
+Once you've bootstrapped and you want to deploy a configuration change. You can run the configure_keep.yaml playbook:
  ```bash
- --skip-tags "dockersetup"
+ansible-playbook configure_keep.yaml -i hosts -K
 ```
+
+## Playbooks
+yaml | Description
+-----|------------
+`bootstrap_keep.yaml` | Installs & configures  [Keep-ecdsa](https://github.com/keep-network/keep-ecdsa) and [Keep-core](https://github.com/keep-network/keep-core/blob/master/docs/run-random-beacon.adoc)
+`configure_keep.yaml` | Applies configuration changes and restarts Keep-ecdsa & Keep-core
 
 ## Future plans 🚀:
 - [x] Provisioning of docker and other related dependencies.
 - [x] Deploys and executes Keep-client and Keep-ecdsa-client docker instances
 - [X] Compartmentalize sets of tasks and provide greater non-linear control.
 - [ ] Better security and secrets handling (Ansible Vaults)
-- [ ] Alert notifications for network/instance failures & Network Upgrades.
-- [ ] Setting up Log Monitoring and Pipelining(?) (E.g. [ElasticStack](https://www.notion.so/Setting-up-Elastic-Stack-Dashboard-14f9edc94418468bb95af40417a0332a))
 - [ ] Cross-OS compatibility for docker-setup role
-- [ ] Main Net
+- [ ] Deployment of filebeat configurations for Log Monitoring using [ElasticStack](https://www.notion.so/Setting-up-Elastic-Stack-Dashboard-14f9edc94418468bb95af40417a0332a))

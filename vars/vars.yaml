@@ -3,7 +3,6 @@ ip: "166.166.166.66"
 
 # Credentials for docker operational user. Auto-generates
 username: keep
-password: changethisplz
 
 # Ethereum Wallet Details
 account:
