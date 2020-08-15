@@ -1,0 +1,55 @@
+---
+- hosts: keep
+  gather_facts: no
+  become: yes
+  
+  roles:
+    - firewall
+    - common
+    - docker-setup
+    - keep-client
+    - keep-ecdsa
+
+  tasks:        
+    - block:
+      - name: Run the keep-client container
+        become: yes
+        docker_container:
+          image: "keepnetwork/keep-client:{{ docker.keep_client_version }}"
+          name: keep-client
+          state: started
+          restart: yes
+          command: --config /mnt/config/config.toml start
+          volumes:
+            - "{{ '/home/{0}/keep-client:/mnt'.format(username) }}"
+          ports: "{{ '{0}:{1}'.format(keep_client.port.local, keep_client.port.container) }}"
+          env:
+            LOG_LEVEL: info
+            KEEP_ETHEREUM_PASSWORD: "{{ account.password }}"
+            IPFS_LOGGING_FMT: nocolor
+            GOLOG_FILE: /var/log/keep/keep.log
+            GOLOG_TRACING_FILE: /var/log/keep/trace.json
+      rescue:
+        - name: Report the failure and suggested fix
+          debug: msg="The keep-client container couldn't be started. Try stop+removing running docker containers b4 retrying."
+
+    - block:
+      - name: Run the keep-ecdsa container
+        become: yes
+        docker_container:
+          image: "keepnetwork/keep-ecdsa-client:{{ docker.keep_ecdsa_version }}"
+          name: keep-ecdsa
+          state: started
+          restart: yes
+          command: --config /mnt/keep-ecdsa/config/config.toml start
+          entrypoint:
+            - /usr/local/bin/keep-ecdsa 
+          volumes:
+            - "{{ '/home/{0}/keep-ecdsa:/mnt/keep-ecdsa'.format(username) }}"
+          ports: "{{ '{0}:{1}'.format(keep_ecdsa.port.local, keep_ecdsa.port.container) }}"
+          env:
+            LOG_LEVEL: info
+            KEEP_ETHEREUM_PASSWORD: "{{ account.password }}"
+      rescue:
+        - name: Report the failure and suggested fix
+          debug: msg="The keep-ecdsa container couldn't be started. Try stop+removing running docker containers b4 retrying."    
