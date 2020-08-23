@@ -25,7 +25,13 @@
           command: --config /mnt/config/config.toml start
           volumes:
             - "{{ '/home/{0}/keep-client:/mnt'.format(username) }}"
+            - "{{ '/home/{0}/keep-client/logs:/var/log/keep'.format(username) }}"
           ports: "{{ '{0}:{1}'.format(keep_client.port.local, keep_client.port.container) }}"
+          log_driver: "json-file"
+          log_options: {
+            "max-size": "10m",
+            "max-file": "3"
+            }
           env:
             LOG_LEVEL: info
             KEEP_ETHEREUM_PASSWORD: "{{ account.password }}"
@@ -49,10 +55,18 @@
             - /usr/local/bin/keep-ecdsa 
           volumes:
             - "{{ '/home/{0}/keep-ecdsa:/mnt/keep-ecdsa'.format(username) }}"
+            - "{{ '/home/{0}/keep-ecdsa/logs:/var/log/keep'.format(username) }}"
           ports: "{{ '{0}:{1}'.format(keep_ecdsa.port.local, keep_ecdsa.port.container) }}"
+          log_driver: "json-file"
+          log_options: {
+            "max-size": "10m",
+            "max-file": "3"
+            }
           env:
             LOG_LEVEL: info
             KEEP_ETHEREUM_PASSWORD: "{{ account.password }}"
+            GOLOG_FILE: "/var/log/keep/keep.log"
+            GOLOG_TRACING_FILE: "/var/log/keep/trace.json"
       rescue:
         - name: Report the failure and suggested fix
           debug: msg="The keep-ecdsa container couldn't be started. Try stop+removing running docker containers b4 retrying."    
