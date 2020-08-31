@@ -1,0 +1,20 @@
+---
+java_packages:
+  - openjdk-8-jdk
+
+keepclient_logs: /home/keep/keep-client/logs/keep.log
+keepecdsa_logs: /home/keep/keep-ecdsa/logs/keep.log
+
+filebeat_inputs:
+  - type: log
+    paths:
+      - /var/log/auth.log
+      - /home/keep/keep-client/logs/keep.log
+      - /home/keep/keep-ecdsa/logs/keep.log
+
+elasticsearch_hosts:
+  - https://XXXXXXXXXXXXXXXXXXXXXX:9243
+
+elasticsearch_pw: XXXXXXXXXXXXXXXXXXXXX
+
+logstash_listen_port_beats: 5044

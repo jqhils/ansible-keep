@@ -10,8 +10,9 @@ Set of ansible playbooks for deploying, monitoring and managing KEEP validator i
 * Ubuntu Server setup with a sudo-enabled user to operate ansible tasks.
     * Support for other OS families scoped.
 
+<br />
 
-# Configuration
+# KEEP Configuration
 ## Step 1
 Change the ./vars/vars.yaml varaiables configuration file accordingly.
 
@@ -41,16 +42,41 @@ Once you've bootstrapped and you want to deploy a configuration change. You can 
 ansible-playbook configure_keep.yaml -i hosts -K
 ```
 
+<br />
+
+# Configuring ELK (Experimental)
+## Step 1
+Create your own Elastic Cloud deployment. Follow the steps [here](https://www.notion.so/Setting-up-Elastic-Stack-Dashboard-14f9edc94418468bb95af40417a0332a)
+
+## Step 2
+Change the ./vars/elk_vars.yaml variables configuration file accordingly.
+
+## Step 3
+Install the ansible role dependencies from galaxy:
+```bash
+ansible-galaxy install geerlingguy.java geerlingguy.logstash geerlingguy.filebeat
+```
+
+# Usage
+
+Execute the ELK Playbook:
+```bash
+ansible-playbook bootstrap_elk.yaml -i hosts -K
+```
+
+
 ## Playbooks
 yaml | Description
 -----|------------
 `bootstrap_keep.yaml` | Installs & configures  [Keep-ecdsa](https://github.com/keep-network/keep-ecdsa) and [Keep-core](https://github.com/keep-network/keep-core/blob/master/docs/run-random-beacon.adoc)
 `configure_keep.yaml` | Applies configuration changes and restarts Keep-ecdsa & Keep-core
+`bootstrap_elk.yaml` | Installs filebeat+logstash and ingests KEEP logs to ELK
 
 ## Future plans 🚀:
 - [x] Provisioning of docker and other related dependencies.
 - [x] Deploys and executes Keep-client and Keep-ecdsa-client docker instances
 - [X] Compartmentalize sets of tasks and provide greater non-linear control.
+- [ ] Resume on restart configuration. (service)
 - [ ] Better security and secrets handling (Ansible Vaults)
 - [ ] Cross-OS compatibility for docker-setup role
-- [ ] Deployment of filebeat configurations for Log Monitoring using [ElasticStack](https://www.notion.so/Setting-up-Elastic-Stack-Dashboard-14f9edc94418468bb95af40417a0332a))
+- [X] Deployment of filebeat configurations for Log Monitoring using [ElasticStack](https://www.notion.so/Setting-up-Elastic-Stack-Dashboard-14f9edc94418468bb95af40417a0332a))

@@ -50,7 +50,7 @@
           restart: yes
           command: --config /mnt/keep-ecdsa/config/config.toml start
           entrypoint:
-            - /usr/local/bin/keep-ecdsa 
+            - /usr/local/bin/keep-ecdsa
           volumes:
             - "{{ '/home/{0}/keep-ecdsa:/mnt/keep-ecdsa'.format(username) }}"
             - "{{ '/home/{0}/keep-ecdsa/logs:/var/log/keep'.format(username) }}"
@@ -63,6 +63,7 @@
           env:
             LOG_LEVEL: info
             KEEP_ETHEREUM_PASSWORD: "{{ account.password }}"
+            IPFS_LOGGING_FMT: nocolor
             GOLOG_FILE: "/var/log/keep/keep.log"
             GOLOG_TRACING_FILE: "/var/log/keep/trace.json"
       rescue:

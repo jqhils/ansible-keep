@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: geerlingguy.java
+  - role: geerlingguy.logstash
+  - role: geerlingguy.filebeat
