@@ -8,8 +8,10 @@
   roles:
     - firewall
     - common
-    - keep-client
-    - keep-ecdsa
+    - role: keep-client
+      become: yes
+    - role: keep-ecdsa
+      become: yes
 
   tasks:        
     - block:
