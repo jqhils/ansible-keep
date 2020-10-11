@@ -2,7 +2,7 @@ filter {
   if [log][file][path] == "{{ keepclient_logs }}" {
     grok {
       patterns_dir => "./patterns"
-      match => { "message" => "%{TIMESTAMP_ISO8601} %{LOGLEVEL} %{NOTSPACE:module} %{JAVACLASS}:%{INT:line_number}: number of connected peers: \[%{INT:peer_count}\]%{GREEDYDATA:message}"}
+      match => { "message" => "%{TIMESTAMP_ISO8601}%{SPACE}%{LOGLEVEL}%{SPACE}%{NOTSPACE:module}%{SPACE}number of connected peers: \[%{INT:peer_count}\]%{GREEDYDATA:message}"}
       remove_tag => ["_grokparsefailure"]
       add_field => { "subType" => "total_peers" }
       remove_tag => ["_grokparsefailure"]
@@ -10,7 +10,7 @@ filter {
     if "_grokparsefailure" in [tags] {
       grok {
         patterns_dir => "./patterns"
-        match => { "message" => "%{TIMESTAMP_ISO8601} %{LOGLEVEL} %{NOTSPACE:module} %{JAVACLASS}:%{INT:line_number}: %{GREEDYDATA:message}" }
+        match => { "message" => "%{TIMESTAMP_ISO8601} %{SPACE} %{LOGLEVEL} %{SPACE} %{GREEDYDATA:message}" }
         add_field => { "subType" => "all" }
         remove_tag => ["_grokparsefailure"]
       }
