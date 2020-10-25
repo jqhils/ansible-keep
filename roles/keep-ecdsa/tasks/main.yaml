@@ -9,23 +9,21 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ username }}"
+    owner: "{{ ansible_ssh_user }}"
   with_items:
-    - "{{ '/home/{0}/keep-ecdsa'.format(username) }}"
-    - "{{ '/home/{0}/keep-ecdsa/config'.format(username) }}"
-    - "{{ '/home/{0}/keep-ecdsa/keystore'.format(username) }}"
-    - "{{ '/home/{0}/keep-ecdsa/persistence'.format(username) }}"
-    - "{{ '/home/{0}/keep-ecdsa/persistence/archive'.format(username) }}"
-    - "{{ '/home/{0}/keep-ecdsa/persistence/current'.format(username) }}"
+    - "{{ '/home/{0}/keep-ecdsa'.format(ansible_ssh_user) }}"
+    - "{{ '/home/{0}/keep-ecdsa/config'.format(ansible_ssh_user) }}"
+    - "{{ '/home/{0}/keep-ecdsa/keystore'.format(ansible_ssh_user) }}"
+    - "{{ '/home/{0}/keep-ecdsa/persistence'.format(ansible_ssh_user) }}"
 
 - name: Deploy keep-ecdsa config
   template:
-    owner: "{{ username }}"
+    owner: "{{ ansible_ssh_user }}"
     src: config.toml.jn2
-    dest: "{{ '/home/{0}/keep-ecdsa/config/config.toml'.format(username) }}"
+    dest: "{{ '/home/{0}/keep-ecdsa/config/config.toml'.format(ansible_ssh_user) }}"
 
 - name: Deploy keep_wallet.json for keep-ecdsa
   copy:
-    owner: "{{ username }}"
+    owner: "{{ ansible_ssh_user }}"
     src: "{{ wallet }}"
-    dest: "{{ '/home/{0}/keep-ecdsa/keystore/keep_wallet.json'.format(username) }}"
+    dest: "{{ '/home/{0}/keep-ecdsa/keystore/keep_wallet.json'.format(ansible_ssh_user) }}"

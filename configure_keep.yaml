@@ -1,13 +1,13 @@
 ---
 - hosts: keep
-  gather_facts: no
+  # gather_facts: no
   
   vars_files:
     - ./vars/vars.yaml
   
   roles:
     - firewall
-    - common
+#    - common
     - role: keep-client
       become: yes
     - role: keep-ecdsa
@@ -24,8 +24,8 @@
           restart: yes
           command: --config /mnt/config/config.toml start
           volumes:
-            - "{{ '/home/{0}/keep-client:/mnt'.format(username) }}"
-            - "{{ '/home/{0}/keep-client/logs:/var/log/keep'.format(username) }}"
+            - "{{ '/home/{0}/keep-client:/mnt'.format(ansible_ssh_user) }}"
+            - "{{ '/home/{0}/keep-client/logs:/var/log/keep'.format(ansible_ssh_user) }}"
           ports: "{{ '{0}:{1}'.format(keep_client.port.local, keep_client.port.container) }}"
           log_driver: "json-file"
           log_options: {
@@ -54,8 +54,8 @@
           entrypoint:
             - /usr/local/bin/keep-ecdsa
           volumes:
-            - "{{ '/home/{0}/keep-ecdsa:/mnt/keep-ecdsa'.format(username) }}"
-            - "{{ '/home/{0}/keep-ecdsa/logs:/var/log/keep'.format(username) }}"
+            - "{{ '/home/{0}/keep-ecdsa:/mnt/keep-ecdsa'.format(ansible_ssh_user) }}"
+            - "{{ '/home/{0}/keep-ecdsa/logs:/var/log/keep'.format(ansible_ssh_user) }}"
           ports: "{{ '{0}:{1}'.format(keep_ecdsa.port.local, keep_ecdsa.port.container) }}"
           log_driver: "json-file"
           log_options: {
