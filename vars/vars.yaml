@@ -1,9 +1,3 @@
-# IP of your keep instance. Same as specified in hosts file
-ip: "166.166.166.66"
-
-# Credentials for docker operational user. Auto-generates
-username: keep
-
 # Ethereum Wallet Details
 account:
   address: "0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"

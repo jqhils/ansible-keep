@@ -9,21 +9,21 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: "{{ username }}"
+    owner: "{{ ansible_ssh_user }}"
   with_items:
-    - "{{ '/home/{0}/keep-client'.format(username) }}"
-    - "{{ '/home/{0}/keep-client/config'.format(username) }}"
-    - "{{ '/home/{0}/keep-client/keystore'.format(username) }}"
-    - "{{ '/home/{0}/keep-client/persistence'.format(username) }}"
+    - "{{ '/home/{0}/keep-client'.format(ansible_ssh_user) }}"
+    - "{{ '/home/{0}/keep-client/config'.format(ansible_ssh_user) }}"
+    - "{{ '/home/{0}/keep-client/keystore'.format(ansible_ssh_user) }}"
+    - "{{ '/home/{0}/keep-client/persistence'.format(ansible_ssh_user) }}"
 
 - name: Deploy keep-client config
   template:
-    owner: "{{ username }}"
+    owner: "{{ ansible_ssh_user }}"
     src: config.toml.jn2
-    dest: "{{ '/home/{0}/keep-client/config/config.toml'.format(username) }}"
+    dest: "{{ '/home/{0}/keep-client/config/config.toml'.format(ansible_ssh_user) }}"
 
 - name: Deploy keep_wallet.json for keep-client
   copy:
-    owner: "{{ username }}"
+    owner: "{{ ansible_ssh_user }}"
     src: "{{ wallet }}"
-    dest: "{{ '/home/{0}/keep-client/keystore/keep_wallet.json'.format(username) }}"
+    dest: "{{ '/home/{0}/keep-client/keystore/keep_wallet.json'.format(ansible_ssh_user) }}"

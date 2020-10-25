@@ -23,7 +23,7 @@
   ]
   Port = {{ keep_client.port.container }}
   # Override the node’s default addresses announced in the network
-  AnnouncedAddresses = ["/ip4/{{ ip }}/tcp/{{ keep_client.port.local }}"]
+  AnnouncedAddresses = ["/ip4/{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}/tcp/{{ keep_client.port.local }}"]
 
 # Storage is encrypted
 [Storage]
