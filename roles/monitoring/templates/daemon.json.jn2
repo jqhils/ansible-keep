@@ -1,0 +1,7 @@
+{
+    "debug" : true,
+    "log-driver": "loki",
+    "log-opts": {
+        "loki-url": "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:3100/loki/api/v1/push"
+    }
+}

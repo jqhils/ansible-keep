@@ -1,0 +1,101 @@
+---
+- name: Install curl
+  apt:
+    name: curl
+    state: present
+
+- name: Install docker-compose
+  apt:
+    name: docker-compose
+    state: present
+
+# Upgrade docker-compose
+
+
+### Prometheus Configuration
+- name: Create prometheus directory if it doesn't exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    recurse: "yes"
+    mode: "0777"
+  with_items:
+    - "{{ '/home/{0}/prometheus'.format(ansible_ssh_user) }}"
+    - "{{ '/home/{0}/prometheus/prometheus-data'.format(ansible_ssh_user) }}"
+
+- name: Deploy prometheus-data docker-compose config
+  template:
+    owner: "{{ ansible_ssh_user }}"
+    src: prometheus-docker-compose.yml.jn2
+    dest: "{{ '/home/{0}/prometheus/docker-compose.yml'.format(ansible_ssh_user) }}"
+
+- name: Deploy prometheus config
+  template:
+    owner: "{{ ansible_ssh_user }}"
+    src: prometheus.yml.jn2
+    dest: "{{ '/home/{0}/prometheus/prometheus.yml'.format(ansible_ssh_user) }}"
+
+#- name: Tear down existing services
+#  become: true
+#  community.general.docker_compose:
+#    project_src: "{{ '/home/{0}/prometheus'.format(ansible_ssh_user) }}"
+#    state: absent
+
+#- name: Create and start the service defined in prometheus' docker-compose.yml
+#  become: true
+#  community.general.docker_compose:
+#    project_src: "{{ '/home/{0}/prometheus'.format(ansible_ssh_user) }}"
+#    files:
+#    - docker-compose.yml
+#    state: present
+#  register: output
+
+### Loki Configuration
+- name: Create loki directory if it doesn't exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+  with_items:
+    - "{{ '/home/{0}/loki'.format(ansible_ssh_user) }}"
+
+- name: Deploy loki docker-compose config
+  template:
+    owner: "{{ ansible_ssh_user }}"
+    src: loki-docker-compose.yml.jn2
+    dest: "{{ '/home/{0}/loki/docker-compose.yml'.format(ansible_ssh_user) }}"
+
+- name: Deploy loki local config
+  template:
+    owner: "{{ ansible_ssh_user }}"
+    src: loki-local-config.yaml.jn2
+    dest: "{{ '/home/{0}/loki/local-config.yaml'.format(ansible_ssh_user) }}"
+
+- name: Install Loki Docker Driver
+  shell: sudo docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
+  ignore_errors: yes
+
+- name: Deploy docker daemon for loki
+  template:
+    owner: "{{ ansible_ssh_user }}"
+    src: daemon.json.jn2
+    dest: "{{ '/etc/docker/daemon.json'.format(ansible_ssh_user) }}"
+
+#- name: Tear down existing services
+#  become: true
+#  community.general.docker_compose:
+#    project_src: "{{ '/home/{0}/loki'.format(ansible_ssh_user) }}"
+#    state: absent
+
+#- name: Create and start the service defined in loki's docker-compose.yml
+#  become: true
+#  community.general.docker_compose:
+#    project_src: "{{ '/home/{0}/loki'.format(ansible_ssh_user) }}"
+#    files:
+#    - docker-compose.yml
+#    state: present
+#  register: output
+
+# "Register" fact that monitoring is enabled.
+- 
