@@ -25,6 +25,14 @@
   # Override the node’s default addresses announced in the network
   AnnouncedAddresses = ["/ip4/{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}/tcp/{{ keep_client.port.local }}"]
 
+[Metrics]
+    Port = 8080
+    NetworkMetricsTick = 60
+    EthereumMetricsTick = 600
+
+[Diagnostics]
+    Port = 8082
+
 # Storage is encrypted
 [Storage]
   DataDir = "/mnt/persistence"

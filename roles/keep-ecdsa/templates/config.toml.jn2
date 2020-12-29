@@ -32,7 +32,7 @@
 
   Port = {{ keep_ecdsa.port.container }}
   # Override the node’s default addresses announced in the network
-  AnnouncedAddresses = ["/ip4/{{ ip }}/tcp/{{ keep_ecdsa.port.local }}"]
+  AnnouncedAddresses = ["/ip4/{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}/tcp/{{ keep_ecdsa.port.local }}"]
 
 [TSS]
 # Timeout for TSS protocol pre-parameters generation. The value

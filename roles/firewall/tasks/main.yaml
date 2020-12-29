@@ -1,4 +1,25 @@
 ---
+- name: Allow ssh communication
+  become: yes
+  ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+    
+- name: Set base ufw incoming policy
+  become: yes
+  ufw:
+    direction: incoming
+    policy: deny
+    state: enabled
+
+- name: Set base ufw outgoing policy
+  become: yes
+  ufw:
+    direction: outgoing
+    policy: allow
+    state: enabled
+
 - name: Allow all access to tcp port configured for keep-client
   become: yes
   ufw:

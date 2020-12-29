@@ -15,6 +15,20 @@
 
   tasks:        
     - block:
+      - name: Stop keep-client container
+        become: yes
+        ignore_errors: yes
+        community.general.docker_container:
+          name: keep-client
+          state: stopped
+
+      - name: Remove keep-client container
+        become: yes
+        ignore_errors: yes
+        community.general.docker_container:
+          name: keep-client
+          state: absent
+
       - name: Run the keep-client container
         become: yes
         docker_container:
@@ -26,23 +40,39 @@
           volumes:
             - "{{ '/home/{0}/keep-client:/mnt'.format(ansible_ssh_user) }}"
             - "{{ '/home/{0}/keep-client/logs:/var/log/keep'.format(ansible_ssh_user) }}"
-          ports: "{{ '{0}:{1}'.format(keep_client.port.local, keep_client.port.container) }}"
-          log_driver: "json-file"
+          ports: 
+            - "{{ '{0}:{1}'.format(keep_client.port.local, keep_client.port.container) }}"
+            - "8081:8080"
+            - "8083:8082"
+          log_driver: loki
           log_options: {
-            "max-size": "10m",
-            "max-file": "3"
+            "loki-url": "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:3100/loki/api/v1/push"
             }
           env:
             LOG_LEVEL: info
             KEEP_ETHEREUM_PASSWORD: "{{ account.password }}"
-            IPFS_LOGGING_FMT: nocolor
-            GOLOG_FILE: /var/log/keep/keep.log
-            GOLOG_TRACING_FILE: /var/log/keep/trace.json
+            # IPFS_LOGGING_FMT: nocolor
+            # GOLOG_FILE: /var/log/keep/keep.log
+            # GOLOG_TRACING_FILE: /var/log/keep/trace.json
       rescue:
         - name: Report the failure and suggested fix
           debug: msg="The keep-client container couldn't be started. Try stop+removing running docker containers b4 retrying."
 
     - block:
+      - name: Stop keep-ecdsa container
+        become: yes
+        ignore_errors: yes
+        community.general.docker_container:
+          name: keep-ecdsa
+          state: stopped
+
+      - name: Remove keep-ecdsa container
+        become: yes
+        ignore_errors: yes
+        community.general.docker_container:
+          name: keep-ecdsa
+          state: absent
+
       - name: Run the keep-ecdsa container
         become: yes
         docker_container:
